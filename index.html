@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Soul Conductor - Demo</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="game-container">
+    <!-- Phaser canvas -->
+    <canvas id="phaser-canvas"></canvas>
+    <!-- Three.js overlay (transparent) -->
+    <canvas id="three-canvas"></canvas>
+
+    <!-- HUD -->
+    <div id="hud">
+      <div id="score">Notes: 0 / 4</div>
+      <div id="message"></div>
+    </div>
+  </div>
+
+  <!-- Phaser 3 -->
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3/dist/phaser.min.js"></script>
+  <!-- Three.js -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.150.0/build/three.min.js"></script>
+
+  <!-- Game scripts -->
+  <script src="phaser-game.js"></script>
+  <script src="three-character.js"></script>
+
+<div id="popup" class="popup">
+  <div class="popup-content">
+    <h2>🎶 You restored the song! 🎶</h2>
+    <p>Level complete — great job!</p>
+    <button onclick="closePopup()">Close</button>
+  </div>
+</div>
+<audio id="bgmusic" src="audio/3Z expectations.mp3" loop></audio>
+
+<script>
+  function closePopup() {
+  document.getElementById('popup').style.display = 'none';
+}
+
+function enterPortal(playerObj, portalObj) {
+  if (!portal.visible) return; // don’t trigger until portal is visible
+  showPopup();
+  player.body.setVelocity(0);
+
+    showPopup(); // show popup
+  playCelebrationSound(); // play celebration jingle
+
+  // Optional celebration
+  AudioManager.setVolume(0, 0.18);
+  AudioManager.setVolume(1, 0.22);
+  AudioManager.setVolume(2, 0.26);
+  AudioManager.setVolume(3, 0.34);
+
+  document.getElementById('message').innerText = 'Portal reached!';
+}
+
+/* Celebration sound: short success jingle */
+function playCelebrationSound() {
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+
+  osc.type = 'triangle';
+  osc.frequency.setValueAtTime(880, ctx.currentTime); // A5
+  osc.frequency.linearRampToValueAtTime(1760, ctx.currentTime + 0.4); // up-sweep
+
+  gain.gain.setValueAtTime(0.2, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+
+  osc.connect(gain).connect(ctx.destination);
+  osc.start();
+  osc.stop(ctx.currentTime + 0.5);
+}
+document.getElementById('bgmusic').play();
+AudioManager.setVolume(0, 0.05); // pad playing softly
+
+</script>
+</body>
+</html>
